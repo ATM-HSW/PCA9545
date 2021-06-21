@@ -1,6 +1,7 @@
 #ifndef __PCA9545_H__
 #define __PCA9545_H__
 
+#include "mbed.h"
 
 class PCA9545 {
   public:
@@ -24,7 +25,10 @@ class PCA9545 {
     }
 
     int enableBus(int8_t busno) {
-      int ret;
+      int ret1, ret2;
+      
+      if(this->m_i2c==nullptr)
+        return 1;
 
       switch(busno) {
         case 0: this->m_cmd[0] = PCA9545_BUS0; break;
@@ -34,13 +38,12 @@ class PCA9545 {
         default: this->m_cmd[0] = 0; break;
       }
 
-      ret = this->m_i2c->write(PCA9545_ADDRESS8BIT, (const char*)m_cmd, 1);
+      ret1 = this->m_i2c->write(PCA9545_ADDRESS8BIT, (const char*)m_cmd, 1);
       this->m_cmd[0] = 0;
-      ret = this->m_i2c->read(PCA9545_ADDRESS8BIT, (char*)m_cmd, 1);
-      if(ret==0 && (this->m_cmd[0]&0x0f) == m_cmd[0]) return 0;
+      ret2 = this->m_i2c->read(PCA9545_ADDRESS8BIT, (char*)m_cmd, 1);
+      if(ret1==0 && ret2==0) return 0;
       else return 1;
     }
-
 };
 
 #endif
